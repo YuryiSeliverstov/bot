@@ -95,10 +95,10 @@ class SearchController extends ApiController
 		
 		if ($airport_name_value)
 		{
-			$q->leftJoin(FlightSegment::tableName(),['flight_id'=>TripService::tableName().'.id']);
+			$qAirport=array_keys(AirPort::find()->select('airport_id')->where(['LIKE','value',$airport_name_value])->indexBy('airport_id')->asArray()->limit(5)->all());
 			$q
-				->leftJoin('`nemo_guide_etalon`.'.AirPort::tableName(),['depAirportId'=>'`nemo_guide_etalon`.'.AirPort::tableName().'.airport_id'])
-				->andWhere(['LIKE','value',$airport_name_value]);
+				->leftJoin(FlightSegment::tableName(),['flight_id'=>TripService::tableName().'.id'])
+				->andWhere(['depAirportId'=>$qAirport]);
 		}
 		
 		return $q->offset($offset)->limit($limit)->all();

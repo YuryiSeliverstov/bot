@@ -5,12 +5,8 @@ namespace app\models;
 use Exception;
 use Swagger\Annotations as SWG;
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
-use yii\db\BaseActiveRecord;
-use yii\behaviors\TimestampBehavior;
 
 /**
  * @SWG\Definition()
@@ -39,4 +35,9 @@ class FlightSegment extends ActiveRecord
             'depAirportId' 			=> 	'depAirportId'
         ];
     }
+	
+	public function getAirport():ActiveQuery
+	{
+		return $this->hasOne(AirPort::class, ['depAirportId' => 'airport_id']);
+	}
 }
