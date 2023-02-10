@@ -42,6 +42,15 @@ class m230209_155434_mod_flight_segment extends Migration
 			SET     fs.tripId = ts.trip_id, fs.tripServiceServiceId=ts.service_id';
 		
 		Yii::$app->db->createCommand($q)->execute();
+		
+		$this->addForeignKey(
+            'fk-' . $this->indexName . 'tripId',
+            $this->tableName,
+            'tripId',
+            '{{%trip}}',
+            'id',
+            'CASCADE'
+        );
     }
 
     public function safeDown()
