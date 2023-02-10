@@ -33,7 +33,7 @@ class SearchController extends ApiController
 	 *		  in ="query",
 	 *        name = "trip.corporate_id",
 	 *        description = "trip.corporate_id",
-	 *        required = false,
+	 *        required = true,
 	 *        type = "integer",
 	 *        default = "3",
 	 *     ),
@@ -41,7 +41,7 @@ class SearchController extends ApiController
 	 *		  in ="query",
 	 *        name = "trip_service.service_id",
 	 *        description = "trip_service.service_id",
-	 *        required = false,
+	 *        required = true,
 	 *        type = "integer",
 	 *        default = "2",
 	 *     ),
@@ -49,9 +49,9 @@ class SearchController extends ApiController
 	 *		  in ="query",
 	 *        name = "airport_name.value",
 	 *        description = "airport_name.value",
-	 *        required = false,
+	 *        required = true,
 	 *        type = "string",
-	 *        default = "Шереметьево, Москва",
+	 *        default = "Домодедово, Москва",
 	 *     ),
 	 *     @SWG\Parameter(
 	 *		  in ="query",
@@ -82,25 +82,17 @@ class SearchController extends ApiController
 	 */
 	public function actionIndex(int $trip_corporate_id=0, int $trip_service_service_id=0, string $airport_name_value='', int $offset=0, int $limit=10): array
 	{
+		$airportIds=array_keys(AirPort::find()->select('airport_id')->where(['LIKE','value',$airport_name_value])->indexBy('airport_id')->asArray()->limit(5)->all());
 		$q=Trip::find();
-		if ($trip_corporate_id)
-		{
-			$q->where(['corporate_id'=>$trip_corporate_id]);
-		}
+		$q
+			->where(['corporate_id'=>$trip_corporate_id])
+			->joinWith('flightSegment')
+			->andWhere(['tripServiceServiceId'=>$trip_service_service_id])
+			->andWhere(['depAirportId'=>$airportIds]);
 		
-		if ($trip_service_service_id)
-		{
-			$q->joinWith('tripService')->andWhere(['service_id'=>$trip_service_service_id]);
-		}
+		#echo $q->createCommand()->getRawSql();
+		#die();
 		
-		if ($airport_name_value)
-		{
-			$qAirport=array_keys(AirPort::find()->select('airport_id')->where(['LIKE','value',$airport_name_value])->indexBy('airport_id')->asArray()->limit(5)->all());
-			$q
-				->leftJoin(FlightSegment::tableName(),['flight_id'=>TripService::tableName().'.id'])
-				->andWhere(['depAirportId'=>$qAirport]);
-		}
-		
-		return $q->offset($offset)->limit($limit)->all();
+		return $q->orderBy(['id'=>SORT_DESC])->offset($offset)->limit($limit)->all();
 	}
 }

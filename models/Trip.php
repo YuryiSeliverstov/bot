@@ -43,4 +43,9 @@ class Trip extends ActiveRecord
 	{
 		return $this->hasMany(TripService::className(), ['trip_id' => 'id']);
 	}
+	
+	public function getFlightSegment()
+	{
+		return $this->hasMany(FlightSegment::className(), ['tripId' => 'id']);
+	}
 }

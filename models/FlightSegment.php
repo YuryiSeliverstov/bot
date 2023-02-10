@@ -24,7 +24,7 @@ class FlightSegment extends ActiveRecord
     public function rules(): array
     {
         return [
-			[['flight_id','depAirportId'],'integer'],
+			[['flight_id','depAirportId','tripId','tripServiceServiceId'],'integer'],
         ];
     }
 
