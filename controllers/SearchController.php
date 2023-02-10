@@ -83,8 +83,7 @@ class SearchController extends ApiController
 	public function actionIndex(int $trip_corporate_id=0, int $trip_service_service_id=0, string $airport_name_value='', int $offset=0, int $limit=10): array
 	{
 		$airportIds=array_keys(AirPort::find()->select('airport_id')->where(['LIKE','value',$airport_name_value])->indexBy('airport_id')->asArray()->limit(5)->all());
-		$q=Trip::find();
-		$q
+		$q=Trip::find()
 			->where(['corporate_id'=>$trip_corporate_id])
 			->joinWith('flightSegment')
 			->andWhere(['tripServiceServiceId'=>$trip_service_service_id])
